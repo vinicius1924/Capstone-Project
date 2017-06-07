@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="material_red_700">#D32F2F</color>
     <color name="material_green_700">#388E3C</color>
+    <color name="line_divider_color">#cccccc</color>
 </resources>

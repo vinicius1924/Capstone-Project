@@ -9,6 +9,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.vinicius.capstone.DividerItemDecoration;
 import com.example.vinicius.capstone.R;
 import com.example.vinicius.capstone.StateMaintainer;
 import com.example.vinicius.capstone.SubredditsRecyclerAdapter;
@@ -70,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 		subredditsRecyclerAdapter = new SubredditsRecyclerAdapter(this.getApplicationContext(), null, 0,
 				  (MainPresenter)mPresenter, (MainModel)mPresenter.getModel());
 
+		subredditsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+		subredditsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		subredditsRecyclerView.setAdapter(subredditsRecyclerAdapter);
 
 		mPresenter.onCreate();

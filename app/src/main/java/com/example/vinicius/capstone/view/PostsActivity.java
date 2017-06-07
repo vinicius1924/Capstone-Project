@@ -8,6 +8,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vinicius.capstone.DividerItemDecoration;
 import com.example.vinicius.capstone.PostsRecyclerAdapter;
 import com.example.vinicius.capstone.R;
 import com.example.vinicius.capstone.StateMaintainer;
@@ -82,6 +84,8 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 
 		postsRecyclerAdapter = new PostsRecyclerAdapter(this.getApplicationContext(), null, 0, (PostsPresenter)mPresenter);
 
+		postsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+		postsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		postsRecyclerView.setAdapter(postsRecyclerAdapter);
 
 		mPresenter.onCreate();
