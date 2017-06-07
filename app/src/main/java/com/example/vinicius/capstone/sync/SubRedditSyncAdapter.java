@@ -181,7 +181,7 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 
 				if(cursorPosts.moveToFirst())
 				{
-					callGetSubredditsPosts = apiServices.getMore25SubredditsPosts("bearer " + token, subredditUrl,
+					callGetSubredditsPosts = apiServices.getMore100SubredditsPosts("bearer " + token, subredditUrl,
 							  cursorPosts.getString(cursorPosts.getColumnIndex(SubredditContract.SubredditsPostsEntry.COLUMN_NAME)));
 				}
 				else

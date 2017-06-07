@@ -68,15 +68,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 
 		toolbarTitle.setText(title);
 
-		((Button)findViewById(R.id.button)).setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				SubRedditSyncAdapter.syncImmediately(getActivityContext());
-			}
-		});
-
 		swipeRefreshLayout.setOnRefreshListener(this);
 
 		setSupportActionBar(toolbar);

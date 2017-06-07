@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        release {
+            keyAlias 'CapstoneProject'
+            keyPassword 'capstone'
+            storeFile file('../keystore.jks')
+            storePassword 'capstone'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
-
     defaultConfig {
         applicationId "com.example.vinicius.capstone"
         minSdkVersion 17
@@ -16,6 +23,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }

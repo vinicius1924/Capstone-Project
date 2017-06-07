@@ -54,4 +54,10 @@ public interface IApiServices
 	Call<GetSubredditsPostsResponse> getMore25SubredditsPosts(@Header("Authorization") String authorization,
 																		 @Path(value = "subredditUrl", encoded = true) String subredditUrl,
 																				 @Query("before") String before);
+
+	@GET("{subredditUrl}new/?limit=100")
+	@Headers({"User-Agent: Capstone"})
+	Call<GetSubredditsPostsResponse> getMore100SubredditsPosts(@Header("Authorization") String authorization,
+																				 @Path(value = "subredditUrl", encoded = true) String subredditUrl,
+																				 @Query("before") String before);
 }
