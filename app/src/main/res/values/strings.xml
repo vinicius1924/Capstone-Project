@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Readdit</string>
+    <string name="sync_account_type">capstone.example.com</string>
+    <string name="content_authority">com.example.vinicius.capstone</string>
+    <string name="ok">OK</string>
+    <string name="mine_subreddits">subscriber</string>
+    <string name="preferences_subreddit_key">preferences_subreddit_key</string>
+    <string name="token_preferences_file_name">token_preferences_file_name</string>
+    <string name="sync_adapter_initialized_preferences_file_name">sync_adapter_initialized_preferences_file_name</string>
+    <string name="sync_adapter_initialized_preferences_key">sync_adapter_initialized_preferences_key</string>
+    <string name="one_account_allowed">One account allowed</string>
+    <string name="no_internet_connection">No Internet connection</string>
+    <string name="tryAgain">Try Again</string>
+    <string name="no_subreddits">No Subreddits</string>
+    <string name="unsubscribed">Unsubscribed</string>
+    <string name="subscribed">Subscribed</string>
+    <string name="comments_label">Comments:</string>
+    <string name="no_more_posts">No new posts</string>
+    <string name="thumbnail_content_description">Thumbnail</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="connection_error">Connection error</string>
+    <string name="accept_permissions">You need to accept permissions</string>
+    <string name="settings_menu">Settings</string>
+    <string name="widget_preference_key">widget</string>
+    <string name="widget_preference_title">Widget Posts</string>
+    <string name="widget_preference_dialog_title">Choose your subreddit</string>
+    <string name="prefDefaultValue">Not selected</string>
+    <string name="no_posts_widget">No posts</string>
+</resources>

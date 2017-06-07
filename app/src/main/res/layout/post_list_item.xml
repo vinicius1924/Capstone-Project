@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/three_line_list_item_height"
+    android:paddingEnd="@dimen/list_item_right_padding"
+    android:paddingTop="@dimen/three_line_list_item_padding_top"
+            android:focusable="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/widget_list_item">
+
+        <ImageView
+            android:id="@+id/postThumbnail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="@dimen/list_item_left_padding"
+            android:background="@color/cardview_dark_background"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/thumbnail_content_description"/>
+
+        <TextView
+            android:id="@+id/postTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:textColor="?android:textColorPrimary"
+            android:layout_marginStart="@dimen/list_item_text_left_padding"
+            android:includeFontPadding="false"
+            android:maxLines="2"
+            android:ellipsize="end"
+            tools:text="This plant is preventing itself from blooming"/>
+
+        <TextView
+            android:id="@+id/postAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:textColor="?android:textColorSecondary"
+            android:layout_below="@id/postTitle"
+            android:layout_marginStart="@dimen/list_item_text_left_padding"
+            android:maxLines="1"
+            tools:text="Fulano"/>
+    </RelativeLayout>
+
+</LinearLayout>

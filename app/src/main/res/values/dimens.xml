@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="toolbar_title_left_padding">72dp</dimen>
+    <dimen name="single_list_item_height">48dp</dimen>
+    <dimen name="three_line_list_item_height">88dp</dimen>
+    <dimen name="three_line_list_item_padding_top">16dp</dimen>
+    <dimen name="three_line_list_item_padding_bottom">20dp</dimen>
+    <dimen name="list_item_right_padding">16dp</dimen>
+    <dimen name="list_item_left_padding">16dp</dimen>
+    <dimen name="list_item_text_left_padding">72dp</dimen>
+    <dimen name="single_item_list_top_padding">8dp</dimen>
+    <dimen name="widget_default_height">110dp</dimen>
+    <dimen name="widget_default_width">250dp</dimen>
+
+</resources>
