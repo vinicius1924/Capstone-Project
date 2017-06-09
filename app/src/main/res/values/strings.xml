@@ -26,4 +26,6 @@
     <string name="widget_preference_dialog_title">Choose your subreddit</string>
     <string name="prefDefaultValue">Not selected</string>
     <string name="no_posts_widget">No posts</string>
+    <string name="refresh_token_error">Error refreshing token</string>
+    <string name="no_data_available">No data available</string>
 </resources>

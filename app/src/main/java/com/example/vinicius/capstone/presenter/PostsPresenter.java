@@ -60,7 +60,7 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onConfigurationChanged(IPostsMVP.RequiredViewOps view)
 	{
-
+		mView = new WeakReference<>(view);
 	}
 
 	/**
@@ -83,12 +83,47 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onCreate()
 	{
-		mModel.initLoader();
+		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onCreate()");
+		mModel.startLoader();
+		mModel.fetchSubredditPosts();
+	}
+
+	@Override
+	public void onStart()
+	{
+		Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onStart()");
+		mModel.onStart();
+	}
+
+	@Override
+	public void onResume()
+	{
+		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onResume()");
+	}
+
+	@Override
+	public void onPause()
+	{
+		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onPause()");
+	}
+
+	@Override
+	public void onStop()
+	{
+		Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onStop()");
+		mModel.onStop();
+	}
+
+	@Override
+	public void loadMore25PostsRequestStopped()
+	{
+		getView().onSwipeRefreshStopped();
 	}
 
 	@Override
 	public void onSwipeRefresh()
 	{
+		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onSwipeRefresh()");
 		mModel.loadMore25Posts();
 	}
 
@@ -141,12 +176,14 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onLoadDataFinished(Cursor data)
 	{
+		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onLoadDataFinished()");
 		getView().onLoadDataFinished(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
+		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onLoaderReset()");
 		getView().onLoaderReset(loader);
 	}
 
@@ -160,11 +197,12 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onLoadPostsFinished()
 	{
+		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onLoadPostsFinished()");
 		getView().onLoadPostsFinished();
 	}
 
 	@Override
-	public void showMessage(String message)
+	public void showMessageOnToast(String message)
 	{
 		getView().showToast(message);
 	}
@@ -192,5 +230,23 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 
 			Log.d(PostsActivity.POSTSACTIVITYTAG, permalink);
 		}
+	}
+
+	@Override
+	public void onListItemSwiped(int postId)
+	{
+		mModel.removePost(postId);
+	}
+
+	@Override
+	public void progressBarVisibility(int visibility)
+	{
+		getView().progressBarVisibility(visibility);
+	}
+
+	@Override
+	public void swipeRefreshEnabled(boolean enabled)
+	{
+		getView().swipeRefreshEnabled(enabled);
 	}
 }

@@ -12,6 +12,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.example.vinicius.capstone.DividerItemDecoration;
 import com.example.vinicius.capstone.PostsRecyclerAdapter;
 import com.example.vinicius.capstone.R;
 import com.example.vinicius.capstone.StateMaintainer;
+import com.example.vinicius.capstone.data.SubredditContract;
 import com.example.vinicius.capstone.interfaces.IPostsMVP;
 import com.example.vinicius.capstone.presenter.PostsPresenter;
 import com.example.vinicius.capstone.sync.SubRedditSyncAdapter;
@@ -43,6 +45,7 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	private SwipeRefreshLayout swipeRefreshLayout;
 	private ProgressBar progressBar;
 	private TextView toolbarTitle;
+	private TextView noDataAvailable;
 
 	// Responsável por manter estado dos objetos inscritos
 	// durante mudanças de configuração
@@ -53,7 +56,7 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Log.d(POSTSACTIVITYTAG, "onCreate()");
+		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_posts);
 
@@ -65,6 +68,7 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 		swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 		toolbarTitle = (TextView) findViewById(R.id.toolbarTitle);
+		noDataAvailable = (TextView) findViewById(R.id.noDataAvailable);
 
 		String title = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME);
 
@@ -88,7 +92,74 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 		postsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		postsRecyclerView.setAdapter(postsRecyclerAdapter);
 
+		new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT)
+		{
+			@Override
+			public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder
+					  target)
+			{
+				return false;
+			}
+
+			@Override
+			public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+			{
+				int postid = postsRecyclerAdapter.getIdAtPosition(viewHolder.getAdapterPosition());
+				mPresenter.onListItemSwiped(postid);
+			}
+		}).attachToRecyclerView(postsRecyclerView);
+
 		mPresenter.onCreate();
+	}
+
+	@Override
+	protected void onStart()
+	{
+		Log.d(POSTSACTIVITYTAG, "PostsActivity.onStart()");
+		super.onStart();
+
+		mPresenter.onStart();
+	}
+
+	@Override
+	protected void onResume()
+	{
+		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onResume()");
+		super.onResume();
+
+		mPresenter.onResume();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onPause()");
+		super.onPause();
+
+		mPresenter.onPause();
+	}
+
+	@Override
+	protected void onStop()
+	{
+		Log.d(POSTSACTIVITYTAG, "PostsActivity.onStop()");
+		super.onStop();
+
+		mPresenter.onStop();
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch(item.getItemId())
+		{
+			/* Este é o id do back button */
+			case android.R.id.home:
+				onBackPressed();
+				return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	/**
@@ -101,8 +172,8 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 		{
 			if(mStateMaintainer.firstTimeIn())
 			{
-				Log.d(POSTSACTIVITYTAG, "Criado fragmento para manter o estado da instância do presenter " +
-						  "e do model");
+//				Log.d(POSTSACTIVITYTAG, "Criado fragmento para manter o estado da instância do presenter " +
+//						  "e do model");
 				initialize(this);
 			}
 			else
@@ -157,20 +228,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch(item.getItemId())
-		{
-			/* Este é o id do back button */
-			case android.R.id.home:
-				onBackPressed();
-				return true;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
 	public void showSnackBar(String message)
 	{
 		progressBarVisibility(View.INVISIBLE);
@@ -186,31 +243,21 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 		Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 	}
 
-	private void progressBarVisibility(int visibility)
+	@Override
+	public void progressBarVisibility(int visibility)
 	{
 		progressBar.setVisibility(visibility);
 	}
 
 	@Override
-	public void onLoadDataFinished(Cursor data)
+	public void swipeRefreshEnabled(boolean enabled)
 	{
-		if(data == null || !data.moveToFirst())
-		{
-			progressBarVisibility(View.VISIBLE);
-		}
-		else
-		{
-			progressBarVisibility(View.INVISIBLE);
-		}
-
-		postsRecyclerAdapter.swapCursor(data);
+		swipeRefreshLayout.setEnabled(enabled);
 	}
 
-	@Override
-	public void onLoaderReset(Loader<Cursor> loader)
+	private void noDataAvailableVisibility(int visibility)
 	{
-		Log.d(POSTSACTIVITYTAG, "PostsActivity.onLoaderReset()");
-		postsRecyclerAdapter.swapCursor(null);
+		noDataAvailable.setVisibility(visibility);
 	}
 
 	@Override
@@ -235,5 +282,35 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	public void onLoadPostsFinished()
 	{
 		swipeRefreshLayout.setRefreshing(false);
+	}
+
+	@Override
+	public void onSwipeRefreshStopped()
+	{
+		swipeRefreshLayout.setRefreshing(true);
+		onRefresh();
+	}
+
+	@Override
+	public void onLoadDataFinished(Cursor data)
+	{
+		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onLoadDataFinished()");
+		if(data == null || !data.moveToFirst())
+		{
+			noDataAvailableVisibility(View.VISIBLE);
+		}
+		else
+		{
+			noDataAvailableVisibility(View.INVISIBLE);
+		}
+
+		postsRecyclerAdapter.swapCursor(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader)
+	{
+		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onLoaderReset()");
+		postsRecyclerAdapter.swapCursor(null);
 	}
 }

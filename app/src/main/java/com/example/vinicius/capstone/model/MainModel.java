@@ -9,12 +9,12 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.Log;
+import android.view.View;
 
 import com.example.vinicius.capstone.R;
 import com.example.vinicius.capstone.SubredditsRecyclerAdapter;
 import com.example.vinicius.capstone.api.ApiClient;
 import com.example.vinicius.capstone.api.GetDefaultSubredditsResponse;
-import com.example.vinicius.capstone.api.GetSubredditsPostsResponse;
 import com.example.vinicius.capstone.data.SubredditContract;
 import com.example.vinicius.capstone.interfaces.IApiServices;
 import com.example.vinicius.capstone.interfaces.IMainMVP;
@@ -23,8 +23,6 @@ import com.example.vinicius.capstone.utils.NetworkUtils;
 import com.example.vinicius.capstone.utils.TokenImpl;
 import com.example.vinicius.capstone.view.MainActivity;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import retrofit2.Call;
@@ -52,9 +50,9 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 	}
 
 	@Override
-	public void initLoader()
+	public void startLoader()
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainModel.initLoader()");
+		Log.d(MainActivity.MAINACTIVITYTAG, "MainModel.startLoader()");
 		(mPresenter.getActivity()).getSupportLoaderManager().initLoader(SUBREDDITSLOADER, null, this);
 	}
 
@@ -73,6 +71,7 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 
 		if(!subredditCursor.moveToFirst())
 		{
+			mPresenter.progressBarVisibility(View.VISIBLE);
 			final IToken tokenImpl = new TokenImpl();
 
 			tokenImpl.getAccountTokenSynchronously(mPresenter.getActivityContext(), new TokenImpl.ITokenResponse()
@@ -102,9 +101,21 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 											  getAccountsByType(mPresenter.getActivityContext().getString(R.string.sync_account_type))[0], token, new TokenImpl.IRefreshTokenResponse()
 									{
 										@Override
-										public void onRefreshTokenResponse(String token)
+										public void onRefreshTokenResponse(String token, Throwable throwable)
 										{
-											getDefaultSubreddits();
+											if(token != null)
+											{
+												getDefaultSubreddits();
+											}
+											else
+											{
+												//TODO: avisar que houve um erro baixando os subreddits para que a MainActivity
+												//TODO: saiba que nao precisa mais mostrar o loader na tela
+												mPresenter.onErrorGetDefaultSubreddits(mPresenter.getActivityContext().getResources().
+														  getString(R.string.refresh_token_error));
+												Log.e(MainActivity.MAINACTIVITYTAG, "MainModel.getDefaultSubreddits() - " +
+														  throwable.toString());
+											}
 										}
 									});
 								}
@@ -137,6 +148,8 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 										cVVector.toArray(cvArray);
 										resolver.bulkInsert(SubredditContract.SubredditsEntry.CONTENT_URI, cvArray);
 									}
+
+									mPresenter.progressBarVisibility(View.INVISIBLE);
 								}
 							}
 
@@ -190,13 +203,11 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 		ContentValues values = new ContentValues();
 		values.put(SubredditContract.SubredditsEntry.COLUMN_SUBSCRIBED, 1);
 
-		int updateResult = mPresenter.getActivityContext().getContentResolver().update(SubredditContract.SubredditsEntry.CONTENT_URI, values,
-				  SubredditContract.SubredditsEntry._ID + " = ?", new String[]{String.valueOf(subredditId)});
-
-		if(updateResult > 0)
-		{
-			fetchSubredditPosts(subredditUrl, subredditId);
-		}
+		mPresenter.getActivityContext().getContentResolver().update(
+				  SubredditContract.SubredditsEntry.CONTENT_URI,
+				  values,
+				  SubredditContract.SubredditsEntry._ID + " = ?",
+				  new String[]{String.valueOf(subredditId)});
 	}
 
 	@Override
@@ -219,105 +230,5 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 	{
 		mPresenter.getActivityContext().getContentResolver().delete(SubredditContract.SubredditsPostsEntry.CONTENT_URI,
 				  SubredditContract.SubredditsPostsEntry.COLUMN_SUBREDDITS_ID + " = ?", new String[]{String.valueOf(subredditId)});
-	}
-
-	private void fetchSubredditPosts(final String subredditUrl, final int subredditId)
-	{
-		// baixa os ultimos 25 posts do subreddit e armazena no banco e dados
-		final IToken tokenImpl = new TokenImpl();
-
-		tokenImpl.getAccountTokenSynchronously(mPresenter.getActivityContext(), new TokenImpl.ITokenResponse()
-		{
-			@Override
-			public void onTokenResponse(final String token)
-			{
-				final IApiServices apiServices = new Retrofit.Builder()
-						  .baseUrl(ApiClient.BASE_URL)
-						  .addConverterFactory(GsonConverterFactory.create())
-						  .build().create(IApiServices.class);//ApiClient.getClient().create(IApiServices.class);
-				Call<GetSubredditsPostsResponse> callGetSubredditsPosts = apiServices.getSubredditsPosts("bearer "
-						  + token, subredditUrl);
-
-				callGetSubredditsPosts.enqueue(new Callback<GetSubredditsPostsResponse>()
-				{
-					@Override
-					public void onResponse(Call<GetSubredditsPostsResponse> call, Response<GetSubredditsPostsResponse> response)
-					{
-						if(response.code() == 401)
-						{
-							IToken refreshToken = new TokenImpl();
-
-							refreshToken.refreshToken(mPresenter.getActivityContext(), mAccountManager.
-												 getAccountsByType(mPresenter.getActivityContext().
-															getString(R.string.sync_account_type))[0], token,
-									  new TokenImpl.IRefreshTokenResponse()
-									  {
-										  @Override
-										  public void onRefreshTokenResponse(String token)
-										  {
-											  fetchSubredditPosts(subredditUrl, subredditId);
-										  }
-									  });
-						}
-						else
-						{
-							List<GetSubredditsPostsResponse.Children> safeForWork = new ArrayList<GetSubredditsPostsResponse
-									  .Children>();
-
-							for(GetSubredditsPostsResponse.Children children : response.body().getData().getChildren())
-							{
-								if(!children.getData().isOver18())
-								{
-									safeForWork.add(children);
-								}
-							}
-
-							Vector<ContentValues> cVVector = new Vector<ContentValues>(safeForWork.size());
-
-							ContentResolver resolver = mPresenter.getActivityContext().getContentResolver();
-
-							for(int i = 0; i < safeForWork.size(); i++)
-							{
-								ContentValues postsValues = new ContentValues();
-
-								String thumbnail = safeForWork.get(i).getData().getThumbnail();
-								String title = safeForWork.get(i).getData().getTitle();
-								int numberOfComments = safeForWork.get(i).getData().getNumberOfComments();
-								String author = safeForWork.get(i).getData().getAuthor();
-								String name = safeForWork.get(i).getData().getName();
-								String permalink = safeForWork.get(i).getData().getPermalink();
-								long createdUtc = safeForWork.get(i).getData().getCreatedUtc();
-								int subredditid = subredditId;
-
-
-								postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_THUMBNAIL, thumbnail);
-								postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_TITLE, title);
-								postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_NUM_COMMENTS, numberOfComments);
-								postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_AUTHOR, author);
-								postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_NAME, name);
-								postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_PERMALINK, permalink);
-								postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_CREATED_UTC, createdUtc);
-								postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_SUBREDDITS_ID, subredditid);
-
-								cVVector.add(postsValues);
-							}
-
-							if(cVVector.size() > 0)
-							{
-								ContentValues[] cvArray = new ContentValues[cVVector.size()];
-								cVVector.toArray(cvArray);
-								resolver.bulkInsert(SubredditContract.SubredditsPostsEntry.CONTENT_URI, cvArray);
-							}
-						}
-					}
-
-					@Override
-					public void onFailure(Call<GetSubredditsPostsResponse> call, Throwable t)
-					{
-						Log.e(MainActivity.MAINACTIVITYTAG, "MainModel.fetchSubredditPosts() - " + t.toString());
-					}
-				});
-			}
-		});
 	}
 }

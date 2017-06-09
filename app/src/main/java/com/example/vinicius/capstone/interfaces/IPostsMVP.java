@@ -24,6 +24,12 @@ public interface IPostsMVP
 
 		void onLoaderReset(android.support.v4.content.Loader<Cursor> loader);
 
+		void progressBarVisibility(int visibility);
+
+		void swipeRefreshEnabled(boolean enabled);
+
+		void onSwipeRefreshStopped();
+
 		Context getAppContext();
 
 		Context getActivityContext();
@@ -44,7 +50,17 @@ public interface IPostsMVP
 
 		void onCreate();
 
+		void onStart();
+
+		void onResume();
+
+		void onStop();
+
+		void onPause();
+
 		void onSwipeRefresh();
+
+		void onListItemSwiped(int postId);
 
 		IPostsMVP.ModelOps getModel();
 
@@ -73,7 +89,13 @@ public interface IPostsMVP
 
 		void onLoadPostsFinished();
 
-		void showMessage(String message);
+		void showMessageOnToast(String message);
+
+		void progressBarVisibility(int visibility);
+
+		void swipeRefreshEnabled(boolean enabled);
+
+		void loadMore25PostsRequestStopped();
 
 		// qualquer operação de retorno Model -> Presenter
 	}
@@ -84,13 +106,17 @@ public interface IPostsMVP
 	 */
 	interface ModelOps
 	{
-		void initLoader();
+		void startLoader();
 
 		void onStart();
 
 		void onStop();
 
 		void loadMore25Posts();
+
+		void removePost(int postId);
+
+		void fetchSubredditPosts();
 
 		void onDestroy();
 		// Qualquer operação referente à dados a ser chamado pelo Presenter

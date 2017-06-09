@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.Log;
+import android.view.View;
 
 import com.example.vinicius.capstone.R;
 import com.example.vinicius.capstone.api.ApiClient;
@@ -38,6 +39,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.example.vinicius.capstone.sync.SubRedditSyncAdapter.ACTION_DATA_UPDATED;
 import static com.example.vinicius.capstone.view.PostsActivity.EXTRA_SUBREDDIT_ID;
 import static com.example.vinicius.capstone.view.PostsActivity.EXTRA_SUBREDDIT_URL;
+import static com.example.vinicius.capstone.view.PostsActivity.POSTSACTIVITYTAG;
 
 /**
  * Created by vinicius on 29/05/17.
@@ -52,6 +54,8 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	private int subredditId;
 	private String subredditUrl;
 
+	private Call<GetSubredditsPostsResponse> callGetMore25SubredditsPosts = null;
+
 	public PostsModel(PostsPresenter mPresenter)
 	{
 		this.mPresenter = mPresenter;
@@ -61,8 +65,16 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	}
 
 	@Override
+	public void startLoader()
+	{
+		//Log.d(POSTSACTIVITYTAG, "PostsModel.startLoader()");
+		(mPresenter.getActivity()).getSupportLoaderManager().initLoader(POSTSLOADER, null, this);
+	}
+
+	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args)
 	{
+		//Log.d(POSTSACTIVITYTAG, "PostsModel.onCreateLoader()");
 		Uri postsUri = SubredditContract.SubredditsPostsEntry.buildSubredditsPostsUri(subredditId);
 
 		android.support.v4.content.CursorLoader cursorLoader = new android.support.v4.content.CursorLoader(
@@ -79,44 +91,54 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data)
 	{
+		//Log.d(POSTSACTIVITYTAG, "PostsModel.onLoadFinished()");
 		mPresenter.onLoadDataFinished(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
+		//Log.d(POSTSACTIVITYTAG, "PostsModel.onLoaderReset()");
 		mPresenter.onLoaderReset(loader);
-	}
-
-	@Override
-	public void initLoader()
-	{
-		(mPresenter.getActivity()).getSupportLoaderManager().initLoader(POSTSLOADER, null, this);
 	}
 
 	@Override
 	public void onStart()
 	{
+		if(callGetMore25SubredditsPosts != null && callGetMore25SubredditsPosts.isCanceled())
+		{
+			Log.d(POSTSACTIVITYTAG, "PostsModel.onStart() - callGetMore25SubredditsPosts.isCanceled() == true");
 
+			mPresenter.loadMore25PostsRequestStopped();
+			callGetMore25SubredditsPosts = null;
+		}
 	}
 
 	@Override
 	public void onStop()
 	{
-
+		if(callGetMore25SubredditsPosts != null)
+		{
+			Log.d(POSTSACTIVITYTAG, "PostsModel.onStop().callGetMore25SubredditsPosts.cancel()");
+			callGetMore25SubredditsPosts.cancel();
+		}
 	}
 
 	@Override
 	public void loadMore25Posts()
 	{
+		//Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts()");
 		final IToken tokenImpl = new TokenImpl();
 
-		Uri uri = SubredditContract.SubredditsPostsEntry.buildSubredditsPostsUri(subredditId);
+		Uri uri = SubredditContract.SubredditsEntry.buildSubredditsUri(subredditId);
 
-		final Cursor cursor = mPresenter.getActivityContext().getContentResolver().query(uri, null,
-				  SubredditContract.SubredditsPostsEntry.COLUMN_SUBREDDITS_ID + " = ?",
-				  new String[]{String.valueOf(subredditId)},
-				  SubredditContract.SubredditsPostsEntry.COLUMN_CREATED_UTC + " DESC");
+		final Cursor cursor = mPresenter.getActivityContext().getContentResolver().query(uri,
+				  new String[]{SubredditContract.SubredditsEntry.COLUMN_LAST_DOWNLOADED},
+				  null,
+				  null,
+				  null);
+
+		cursor.moveToFirst();
 
 
 		tokenImpl.getAccountTokenSynchronously(mPresenter.getActivityContext(), new TokenImpl.ITokenResponse()
@@ -128,28 +150,33 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 						  .baseUrl(ApiClient.BASE_URL)
 						  .addConverterFactory(GsonConverterFactory.create())
 						  .build().create(IApiServices.class);
-				Call<GetSubredditsPostsResponse> callGetSubredditsPosts;
+				//Call<GetSubredditsPostsResponse> callGetSubredditsPosts;
 
-				if(cursor.moveToFirst())
+				String lastDownloaded = cursor.getString(cursor.getColumnIndex(SubredditContract.
+						  SubredditsEntry.COLUMN_LAST_DOWNLOADED));
+
+				if(lastDownloaded != null && !lastDownloaded.isEmpty())
 				{
-					callGetSubredditsPosts = apiServices.getMore25SubredditsPosts("bearer " + token, subredditUrl,
-							  cursor.getString(cursor.getColumnIndex(SubredditContract.SubredditsPostsEntry.COLUMN_NAME)));
+					callGetMore25SubredditsPosts = apiServices.getMore25SubredditsPosts("bearer " + token, subredditUrl,
+							  lastDownloaded);
 				}
 				else
 				{
-					callGetSubredditsPosts = apiServices.getSubredditsPosts("bearer " + token, subredditUrl);
+					callGetMore25SubredditsPosts = apiServices.getSubredditsPosts("bearer " + token, subredditUrl);
 				}
 
 				if(NetworkUtils.isOnline(mPresenter.getActivityContext()))
 				{
-					callGetSubredditsPosts.enqueue(new Callback<GetSubredditsPostsResponse>()
+					callGetMore25SubredditsPosts.enqueue(new Callback<GetSubredditsPostsResponse>()
 					{
 						@Override
 						public void onResponse(Call<GetSubredditsPostsResponse> call, Response<GetSubredditsPostsResponse>
 								  response)
 						{
+							Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onResponse()");
 							if(response.code() == 401)
 							{
+								Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onResponse().refreshToken");
 								AccountManager accountManager = (AccountManager) mPresenter.getActivityContext().
 										  getSystemService(Context.ACCOUNT_SERVICE);
 
@@ -157,7 +184,7 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 										  getAccountsByType(mPresenter.getActivityContext().getString(R.string.sync_account_type))[0], token, new TokenImpl.IRefreshTokenResponse()
 								{
 									@Override
-									public void onRefreshTokenResponse(String token)
+									public void onRefreshTokenResponse(String token, Throwable throwable)
 									{
 										loadMore25Posts();
 									}
@@ -165,6 +192,7 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 							}
 							else
 							{
+								Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onResponse().checkResponse");
 								List<GetSubredditsPostsResponse.Children> safeForWork = new ArrayList<GetSubredditsPostsResponse
 										  .Children>();
 
@@ -212,6 +240,13 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 									cVVector.toArray(cvArray);
 									resolver.bulkInsert(SubredditContract.SubredditsPostsEntry.CONTENT_URI, cvArray);
 
+									ContentValues subredditValues = new ContentValues();
+									subredditValues.put(SubredditContract.SubredditsEntry.COLUMN_LAST_DOWNLOADED,
+											  cVVector.get(0).getAsString(SubredditContract.SubredditsPostsEntry.COLUMN_NAME));
+
+									resolver.update(SubredditContract.SubredditsEntry.CONTENT_URI, subredditValues,
+											  SubredditContract.SubredditsEntry._ID + " = ?", new String[]{String.valueOf(subredditId)});
+
 									if(PreferencesUtils.getSelectedSubredditWidget(mPresenter.getActivityContext()).equals(String.valueOf(subredditId)))
 									{
 										Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
@@ -220,10 +255,12 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 								}
 								else
 								{
-									mPresenter.showMessage(mPresenter.getActivityContext().getResources().
+									Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onResponse().noPosts");
+									mPresenter.showMessageOnToast(mPresenter.getActivityContext().getResources().
 											  getString(R.string.no_more_posts));
 								}
 
+								callGetMore25SubredditsPosts = null;
 								mPresenter.onLoadPostsFinished();
 							}
 						}
@@ -231,15 +268,186 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 						@Override
 						public void onFailure(Call<GetSubredditsPostsResponse> call, Throwable t)
 						{
-							Log.e(PostsActivity.POSTSACTIVITYTAG, "PostsModel.loadMore25Posts() - " + t.toString());
-							mPresenter.onLoadPostsFinished();
+							Log.e(PostsActivity.POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onFailure() - " + t.toString());
+							callGetMore25SubredditsPosts = null;
+
+							if(!call.isCanceled())
+							{
+								mPresenter.onLoadPostsFinished();
+							}
 						}
 					});
 				}
 				else
 				{
+					callGetMore25SubredditsPosts = null;
 					mPresenter.noInternetConnection();
 					mPresenter.onLoadPostsFinished();
+				}
+			}
+		});
+	}
+
+	@Override
+	public void fetchSubredditPosts()
+	{
+		//Log.d(POSTSACTIVITYTAG, "PostsModel.fetchSubredditPosts()");
+		Uri uri = SubredditContract.SubredditsEntry.buildSubredditsUri(subredditId);
+
+		final Cursor cursor = mPresenter.getActivityContext().getContentResolver().query(uri,
+				  new String[]{SubredditContract.SubredditsEntry.COLUMN_LAST_DOWNLOADED,
+							 SubredditContract.SubredditsEntry.COLUMN_SUBSCRIBED},
+				  null,
+				  null,
+				  null);
+
+		cursor.moveToFirst();
+
+		String lastDownloaded = cursor.getString(cursor.getColumnIndex(SubredditContract.
+				  SubredditsEntry.COLUMN_LAST_DOWNLOADED));
+
+		int subscribed = cursor.getInt(cursor.getColumnIndex(SubredditContract.
+				  SubredditsEntry.COLUMN_SUBSCRIBED));
+
+		if((lastDownloaded == null || lastDownloaded.isEmpty()) && subscribed == 1)
+		{
+			downloadSubredditPosts(subredditUrl, subredditId);
+		}
+	}
+
+	private void downloadSubredditPosts(final String subredditUrl, final int subredditId)
+	{
+		//Log.d(POSTSACTIVITYTAG, "PostsModel.downloadSubredditPosts()");
+		mPresenter.progressBarVisibility(View.VISIBLE);
+		mPresenter.swipeRefreshEnabled(false);
+		// baixa os ultimos 25 posts do subreddit e armazena no banco e dados
+		final IToken tokenImpl = new TokenImpl();
+
+		tokenImpl.getAccountTokenSynchronously(mPresenter.getActivityContext(), new TokenImpl.ITokenResponse()
+		{
+			@Override
+			public void onTokenResponse(final String token)
+			{
+				final IApiServices apiServices = new Retrofit.Builder()
+						  .baseUrl(ApiClient.BASE_URL)
+						  .addConverterFactory(GsonConverterFactory.create())
+						  .build().create(IApiServices.class);
+				Call<GetSubredditsPostsResponse> callGetSubredditsPosts = apiServices.getSubredditsPosts("bearer "
+						  + token, subredditUrl);
+
+				if(NetworkUtils.isOnline(mPresenter.getActivityContext()))
+				{
+					callGetSubredditsPosts.enqueue(new Callback<GetSubredditsPostsResponse>()
+					{
+						@Override
+						public void onResponse(Call<GetSubredditsPostsResponse> call, Response<GetSubredditsPostsResponse> response)
+						{
+							if(response.code() == 401)
+							{
+								IToken refreshToken = new TokenImpl();
+
+								refreshToken.refreshToken(mPresenter.getActivityContext(), mAccountManager.
+										  getAccountsByType(mPresenter.getActivityContext().
+													 getString(R.string.sync_account_type))[0], token, new TokenImpl.IRefreshTokenResponse()
+
+								{
+									@Override
+									public void onRefreshTokenResponse(String token, Throwable throwable)
+									{
+										if(token != null)
+										{
+											downloadSubredditPosts(subredditUrl, subredditId);
+										}
+										else
+										{
+											mPresenter.progressBarVisibility(View.INVISIBLE);
+											mPresenter.swipeRefreshEnabled(true);
+											mPresenter.showMessageOnToast(mPresenter.getActivityContext().getResources().
+													  getString(R.string.refresh_token_error));
+											//TODO: avisar que aconteceu um erro baixando os primeiros 25 posts
+											//TODO: desse subreddit para que PostsActivity possa saber quando não
+											//TODO: mostrar mais o loader na tela
+										}
+									}
+								});
+							}
+							else
+							{
+								List<GetSubredditsPostsResponse.Children> safeForWork = new ArrayList<GetSubredditsPostsResponse.Children>();
+
+								for(GetSubredditsPostsResponse.Children children : response.body().getData().getChildren())
+								{
+									if(!children.getData().isOver18())
+									{
+										safeForWork.add(children);
+									}
+								}
+
+								Vector<ContentValues> cVVector = new Vector<ContentValues>(safeForWork.size());
+
+								ContentResolver resolver = mPresenter.getActivityContext().getContentResolver();
+
+								for(int i = 0; i < safeForWork.size(); i++)
+								{
+									ContentValues postsValues = new ContentValues();
+
+									String thumbnail = safeForWork.get(i).getData().getThumbnail();
+									String title = safeForWork.get(i).getData().getTitle();
+									int numberOfComments = safeForWork.get(i).getData().getNumberOfComments();
+									String author = safeForWork.get(i).getData().getAuthor();
+									String name = safeForWork.get(i).getData().getName();
+									String permalink = safeForWork.get(i).getData().getPermalink();
+									long createdUtc = safeForWork.get(i).getData().getCreatedUtc();
+									int subredditid = subredditId;
+
+
+									postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_THUMBNAIL, thumbnail);
+									postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_TITLE, title);
+									postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_NUM_COMMENTS, numberOfComments);
+									postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_AUTHOR, author);
+									postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_NAME, name);
+									postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_PERMALINK, permalink);
+									postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_CREATED_UTC, createdUtc);
+									postsValues.put(SubredditContract.SubredditsPostsEntry.COLUMN_SUBREDDITS_ID, subredditid);
+
+									cVVector.add(postsValues);
+								}
+
+								if(cVVector.size() > 0)
+								{
+									ContentValues[] cvArray = new ContentValues[cVVector.size()];
+									cVVector.toArray(cvArray);
+									resolver.bulkInsert(SubredditContract.SubredditsPostsEntry.CONTENT_URI, cvArray);
+
+									ContentValues subredditValues = new ContentValues();
+									subredditValues.put(SubredditContract.SubredditsEntry.COLUMN_LAST_DOWNLOADED, cVVector.get(0).getAsString(SubredditContract.SubredditsPostsEntry.COLUMN_NAME));
+
+									resolver.update(SubredditContract.SubredditsEntry.CONTENT_URI, subredditValues, SubredditContract.SubredditsEntry._ID + " = ?", new String[]{String.valueOf(subredditId)});
+								}
+
+								mPresenter.progressBarVisibility(View.INVISIBLE);
+								mPresenter.swipeRefreshEnabled(true);
+							}
+						}
+
+						@Override
+						public void onFailure(Call<GetSubredditsPostsResponse> call, Throwable t)
+						{
+							mPresenter.progressBarVisibility(View.INVISIBLE);
+							mPresenter.swipeRefreshEnabled(true);
+							//TODO: avisar que aconteceu um erro baixando os primeiros 25 posts
+							//TODO: desse subreddit para que PostsActivity possa saber quando não
+							//TODO: mostrar mais o loader na tela
+							mPresenter.showMessageOnToast(mPresenter.getActivityContext().getResources().
+									  getString(R.string.connection_error));
+							Log.e(POSTSACTIVITYTAG, "PostsModel.fetchSubredditPosts() - " + t.toString());
+						}
+					});
+				}
+				else
+				{
+					mPresenter.progressBarVisibility(View.INVISIBLE);
+					mPresenter.noInternetConnection();
 				}
 			}
 		});
@@ -254,5 +462,13 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	public void onDestroy()
 	{
 
+	}
+
+	@Override
+	public void removePost(int postId)
+	{
+		int result = mPresenter.getActivityContext().getContentResolver().delete(SubredditContract.
+							 SubredditsPostsEntry.CONTENT_URI, SubredditContract.SubredditsPostsEntry._ID
+				  + " = ?", new String[]{String.valueOf(postId)});
 	}
 }

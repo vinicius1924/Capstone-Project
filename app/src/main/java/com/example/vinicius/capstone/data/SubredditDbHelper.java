@@ -26,7 +26,8 @@ public class SubredditDbHelper extends SQLiteOpenHelper
 				  SubredditContract.SubredditsEntry._ID + " INTEGER PRIMARY KEY, " +
 				  SubredditContract.SubredditsEntry.COLUMN_NAME + " TEXT NOT NULL, " +
 				  SubredditContract.SubredditsEntry.COLUMN_URL + " TEXT NOT NULL, " +
-				  SubredditContract.SubredditsEntry.COLUMN_SUBSCRIBED + " INTEGER NOT NULL " +
+				  SubredditContract.SubredditsEntry.COLUMN_SUBSCRIBED + " INTEGER NOT NULL, " +
+				  SubredditContract.SubredditsEntry.COLUMN_LAST_DOWNLOADED + " TEXT " +
 				  " );";
 
 		final String SQL_CREATE_POSTS_TABLE = "CREATE TABLE " + SubredditContract.SubredditsPostsEntry.TABLE_NAME + " (" +

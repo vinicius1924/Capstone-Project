@@ -200,6 +200,8 @@ public class LoginActivity extends AccountAuthenticatorActivity
 
 	private void getAccessToken(String code)
 	{
+		webView.setVisibility(View.INVISIBLE);
+		progressBar.setVisibility(View.VISIBLE);
 		Log.d("Authenticator", "LoginActivity.getAccessToken()");
 
 		IApiServices apiServices = new Retrofit.Builder()
@@ -242,10 +244,10 @@ public class LoginActivity extends AccountAuthenticatorActivity
 				res.putExtras(bundle);
 
 				setAccountAuthenticatorResult(res.getExtras());
+				progressBar.setVisibility(View.INVISIBLE);
 				finish();
 
 				if(countAccounts == 0){
-					webView.setVisibility(View.INVISIBLE);
 					startActivity(new Intent(LoginActivity.this, MainActivity.class));
 				}
 			}
@@ -253,6 +255,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
 			@Override
 			public void onFailure(Call<GetAccessTokenResponse> call, Throwable t)
 			{
+				progressBar.setVisibility(View.INVISIBLE);
 				showSnackBar(getResources().getString(R.string.connection_error));
 				Log.e(TAG, "LoginActivity.getAccessToken() - " + t.toString());
 			}

@@ -172,17 +172,23 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 						  .build().create(IApiServices.class);
 				Call<GetSubredditsPostsResponse> callGetSubredditsPosts;
 
-				Uri uri = SubredditContract.SubredditsPostsEntry.buildSubredditsPostsUri(subredditId);
+				Uri uri = SubredditContract.SubredditsEntry.buildSubredditsUri(subredditId);
 
-				final Cursor cursorPosts = mContext.getContentResolver().query(uri, null,
-						  SubredditContract.SubredditsPostsEntry.COLUMN_SUBREDDITS_ID + " = ?",
-						  new String[]{String.valueOf(subredditId)},
-						  SubredditContract.SubredditsPostsEntry.COLUMN_CREATED_UTC + " DESC");
+				final Cursor cursorSubredddit = mContext.getContentResolver().query(uri,
+						  new String[]{SubredditContract.SubredditsEntry.COLUMN_LAST_DOWNLOADED},
+						  null,
+						  null,
+						  null);
 
-				if(cursorPosts.moveToFirst())
+				cursorSubredddit.moveToFirst();
+
+				String lastDownloaded = cursorSubredddit.getString(cursorSubredddit.getColumnIndex(SubredditContract.
+						  SubredditsEntry.COLUMN_LAST_DOWNLOADED));
+
+				if(lastDownloaded != null && !lastDownloaded.isEmpty())
 				{
 					callGetSubredditsPosts = apiServices.getMore100SubredditsPosts("bearer " + token, subredditUrl,
-							  cursorPosts.getString(cursorPosts.getColumnIndex(SubredditContract.SubredditsPostsEntry.COLUMN_NAME)));
+							  lastDownloaded);
 				}
 				else
 				{
@@ -277,6 +283,13 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 									ContentValues[] cvArray = new ContentValues[cVVector.size()];
 									cVVector.toArray(cvArray);
 									resolver.bulkInsert(SubredditContract.SubredditsPostsEntry.CONTENT_URI, cvArray);
+
+									ContentValues subredditValues = new ContentValues();
+									subredditValues.put(SubredditContract.SubredditsEntry.COLUMN_LAST_DOWNLOADED,
+											  cVVector.get(0).getAsString(SubredditContract.SubredditsPostsEntry.COLUMN_NAME));
+
+									resolver.update(SubredditContract.SubredditsEntry.CONTENT_URI, subredditValues,
+											  SubredditContract.SubredditsEntry._ID + " = ?", new String[]{String.valueOf(subredditId)});
 
 									if(PreferencesUtils.getSelectedSubredditWidget(mContext).equals(String.valueOf(subredditId)))
 									{

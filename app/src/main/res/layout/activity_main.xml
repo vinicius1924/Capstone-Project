@@ -59,6 +59,7 @@
         android:layout_height="wrap_content"
         android:indeterminateDrawable="@drawable/progressbar_custom"
         app:layout_anchor="@id/subredditsRecyclerView"
-        app:layout_anchorGravity="center"/>
+        app:layout_anchorGravity="center"
+        android:visibility="invisible"/>
 
 </android.support.design.widget.CoordinatorLayout>

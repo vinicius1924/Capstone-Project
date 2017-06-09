@@ -127,7 +127,7 @@ public class ReadPostActivity extends AppCompatActivity
 
 								{
 									@Override
-									public void onRefreshTokenResponse(String token)
+									public void onRefreshTokenResponse(String token, Throwable throwable)
 									{
 										grabbedToken = token;
 

@@ -49,6 +49,7 @@ public class SubredditContract
 		public static final String COLUMN_NAME = "display_name";
 		public static final String COLUMN_URL = "url";
 		public static final String COLUMN_SUBSCRIBED = "subscribed";
+		public static final String COLUMN_LAST_DOWNLOADED = "last_downloaded";
 
 		/* Função para construir uma URI para encontrar um subreddit específico por seu id */
 		public static Uri buildSubredditsUri(long id) {

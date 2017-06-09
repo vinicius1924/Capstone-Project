@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.vinicius.capstone.R;
 import com.example.vinicius.capstone.SettingsFragment;
@@ -93,6 +94,7 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
+		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.onLoaderReset()");
 		getView().onLoaderReset(loader);
 	}
 
@@ -102,6 +104,7 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.noInternetConnection()");
 		getView().showSnackBar(getView().getActivityContext().getResources()
 				  .getString(R.string.no_internet_connection));
+		getView().setProgressBarVisibility(View.INVISIBLE);
 	}
 
 	@Override
@@ -110,7 +113,7 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.onCreate()");
 		Log.d("Authenticator", "MainPresenter.onCreate()");
 		addAccount();
-		mModel.initLoader();
+		mModel.startLoader();
 	}
 
 	private void addAccount()
@@ -214,6 +217,7 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 	public void onErrorGetDefaultSubreddits(String errorMsg)
 	{
 		getView().showSnackBar(errorMsg);
+		getView().setProgressBarVisibility(View.INVISIBLE);
 	}
 
 	@Override
@@ -294,5 +298,11 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 			default:
 				return false;
 		}
+	}
+
+	@Override
+	public void progressBarVisibility(int visibility)
+	{
+		getView().setProgressBarVisibility(visibility);
 	}
 }

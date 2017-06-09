@@ -41,7 +41,8 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	private ProgressBar progressBar;
 	// Responsável por manter estado dos objetos inscritos
 	// durante mudanças de configuração
-	private final StateMaintainer mStateMaintainer = new StateMaintainer(this.getSupportFragmentManager(), MAINACTIVITYTAG);
+	private final StateMaintainer mStateMaintainer = new StateMaintainer(this.getSupportFragmentManager(),
+			  MAINACTIVITYTAG);
 
 	// Operações no Presenter
 	private IMainMVP.PresenterOps mPresenter;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		Log.d(MAINACTIVITYTAG, "MainActivity.onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
@@ -69,14 +71,50 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 		subredditsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 		subredditsRecyclerView.setHasFixedSize(true);
 
-		subredditsRecyclerAdapter = new SubredditsRecyclerAdapter(this.getApplicationContext(), null, 0,
-				  (MainPresenter)mPresenter, (MainModel)mPresenter.getModel());
+		subredditsRecyclerAdapter = new SubredditsRecyclerAdapter(this.getApplicationContext(), null, 0, (MainPresenter)
+				  mPresenter, (MainModel) mPresenter.getModel());
 
 		subredditsRecyclerView.addItemDecoration(new DividerItemDecoration(this));
 		subredditsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 		subredditsRecyclerView.setAdapter(subredditsRecyclerAdapter);
 
 		mPresenter.onCreate();
+	}
+
+	@Override
+	protected void onStart()
+	{
+		Log.d(MAINACTIVITYTAG, "MainActivity.onStart()");
+		super.onStart();
+
+		mPresenter.onStart();
+	}
+
+	@Override
+	protected void onResume()
+	{
+		Log.d(MAINACTIVITYTAG, "MainActivity.onResume()");
+		super.onResume();
+
+		mPresenter.onResume();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		Log.d(MAINACTIVITYTAG, "MainActivity.onPause()");
+		super.onPause();
+
+		mPresenter.onPause();
+	}
+
+	@Override
+	protected void onStop()
+	{
+		Log.d(MAINACTIVITYTAG, "MainActivity.onStop()");
+		super.onStop();
+
+		mPresenter.onStop();
 	}
 
 	@Override
@@ -98,38 +136,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	protected void onStart()
-	{
-		super.onStart();
-
-		mPresenter.onStart();
-	}
-
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-
-		mPresenter.onResume();
-	}
-
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
-
-		mPresenter.onPause();
-	}
-
-	@Override
-	protected void onStop()
-	{
-		super.onStop();
-
-		mPresenter.onStop();
-	}
-
 	/**
 	 * Inicia e reinicia o Presenter. Este método precisa ser chamado
 	 * após {@link Activity#onCreate(Bundle)}
@@ -140,8 +146,7 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 		{
 			if(mStateMaintainer.firstTimeIn())
 			{
-				Log.d(MAINACTIVITYTAG, "Criado fragmento para manter o estado da instância do presenter " +
-						  "e do model");
+				Log.d(MAINACTIVITYTAG, "Criado fragmento para manter o estado da instância do presenter " + "e do model");
 				initialize(this);
 			}
 			else
@@ -196,37 +201,25 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	}
 
 	@Override
-	public void showToast(String msg)
+	public void setProgressBarVisibility(int visibility)
 	{
-		Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void showAlert(String msg)
-	{
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivityContext());
-		builder.setMessage(msg)
-				  .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-					  public void onClick(DialogInterface dialog, int id) {
-						  dialog.dismiss();
-					  }
-				  }).show();
+		progressBar.setVisibility(visibility);
 	}
 
 	@Override
 	public void showSnackBar(String message)
 	{
-		progressBarVisibility(View.INVISIBLE);
-
-		snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_INDEFINITE)
-					  .setAction(getResources().getString(R.string.tryAgain), new View.OnClickListener() {
-					  @Override
-					  public void onClick(View view) {
-						  snackbar.dismiss();
-						  progressBarVisibility(View.VISIBLE);
-						  mPresenter.getDefaultSubreddits();
-					  }
-				  });
+		snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_INDEFINITE).setAction(getResources()
+				  .getString(R.string.tryAgain), new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				snackbar.dismiss();
+				setProgressBarVisibility(View.VISIBLE);
+				mPresenter.getDefaultSubreddits();
+			}
+		});
 
 		snackbar.show();
 	}
@@ -252,14 +245,15 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	public void onLoadDataFinished(Cursor data)
 	{
+		Log.d(MAINACTIVITYTAG, "MainActivity.onLoadDataFinished()");
 		/* significa que os subreddits default não foram baixados da api e armazenados no banco de dados local */
 		if(data == null || !data.moveToFirst())
 		{
-			progressBarVisibility(View.VISIBLE);
+			setProgressBarVisibility(View.VISIBLE);
 		}
 		else
 		{
-			progressBarVisibility(View.INVISIBLE);
+			setProgressBarVisibility(View.INVISIBLE);
 		}
 
 		subredditsRecyclerAdapter.swapCursor(data);
@@ -268,11 +262,7 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
+		Log.d(MAINACTIVITYTAG, "MainActivity.onLoaderReset()");
 		subredditsRecyclerAdapter.swapCursor(null);
-	}
-
-	private void progressBarVisibility(int visibility)
-	{
-		progressBar.setVisibility(visibility);
 	}
 }

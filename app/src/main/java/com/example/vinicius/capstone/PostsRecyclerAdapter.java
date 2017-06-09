@@ -84,4 +84,10 @@ public class PostsRecyclerAdapter extends CursorRecyclerAdapter<PostsRecyclerAda
 			mOnClickListener.onListItemClick(cursor.getInt(idColumnIndex));
 		}
 	}
+
+	public int getIdAtPosition(int position) {
+
+		getCursor().moveToPosition(position);
+		return getCursor().getInt(getCursor().getColumnIndex(SubredditContract.SubredditsPostsEntry._ID));
+	}
 }

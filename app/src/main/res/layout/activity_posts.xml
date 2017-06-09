@@ -58,5 +58,16 @@
         android:layout_height="wrap_content"
         android:indeterminateDrawable="@drawable/progressbar_custom"
         app:layout_anchor="@id/swipe_refresh"
-        app:layout_anchorGravity="center"/>
+        app:layout_anchorGravity="top|center_horizontal"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/noDataAvailable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_data_available"
+        app:layout_anchor="@id/swipe_refresh"
+        app:layout_anchorGravity="center"
+        android:visibility="invisible"/>
 </android.support.design.widget.CoordinatorLayout>

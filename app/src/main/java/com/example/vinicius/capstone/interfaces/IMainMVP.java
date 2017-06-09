@@ -18,10 +18,6 @@ public interface IMainMVP
 	 */
 	interface RequiredViewOps
 	{
-		void showToast(String msg);
-
-		void showAlert(String msg);
-
 		void showSnackBar(String message);
 
 		void finishActivity();
@@ -33,6 +29,8 @@ public interface IMainMVP
 		Context getAppContext();
 
 		Context getActivityContext();
+
+		void setProgressBarVisibility(int visibility);
 
 		// qualquer outra operação na UI
 	}
@@ -86,6 +84,8 @@ public interface IMainMVP
 		void onLoaderReset(android.support.v4.content.Loader<Cursor> loader);
 
 		void noInternetConnection();
+
+		void progressBarVisibility(int visibility);
 		// qualquer operação de retorno Model -> Presenter
 	}
 
@@ -95,7 +95,7 @@ public interface IMainMVP
 	 */
 	interface ModelOps
 	{
-		void initLoader();
+		void startLoader();
 
 		void getDefaultSubreddits();
 		// Qualquer operação referente à dados a ser chamado pelo Presenter

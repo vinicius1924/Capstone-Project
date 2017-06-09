@@ -39,7 +39,7 @@ public class TokenImpl implements IToken
 
 	public interface IRefreshTokenResponse
 	{
-		void onRefreshTokenResponse(String token);
+		void onRefreshTokenResponse(String token, Throwable throwable);
 	}
 
 	public interface ITokenResponse
@@ -76,12 +76,13 @@ public class TokenImpl implements IToken
 						  getSystemService(Context.ACCOUNT_SERVICE)).getAccountsByType(context.
 						  getString(R.string.sync_account_type))[0], ACCOUNT_TOKEN_TYPE_FULL_ACCESS, newToken);
 
-				refreshTokenResponse.onRefreshTokenResponse(newToken);
+				refreshTokenResponse.onRefreshTokenResponse(newToken, null);
 			}
 
 			@Override
 			public void onFailure(Call<GetAccessTokenResponse> call, Throwable t)
 			{
+				refreshTokenResponse.onRefreshTokenResponse(null, t);
 				Log.e(TAG, "TokenImpl.refreshToken() - " + t.toString());
 			}
 		});
