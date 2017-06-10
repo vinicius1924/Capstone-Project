@@ -150,7 +150,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 						  .baseUrl(ApiClient.BASE_URL)
 						  .addConverterFactory(GsonConverterFactory.create())
 						  .build().create(IApiServices.class);
-				//Call<GetSubredditsPostsResponse> callGetSubredditsPosts;
 
 				String lastDownloaded = cursor.getString(cursor.getColumnIndex(SubredditContract.
 						  SubredditsEntry.COLUMN_LAST_DOWNLOADED));
