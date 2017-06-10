@@ -24,7 +24,6 @@ public class SubRedditAuthenticatorService extends Service
 	@Override
 	public IBinder onBind(Intent intent)
 	{
-		Log.d("Authenticator", "SubRedditAuthenticatorService.onBind()");
 		return mAuthenticator.getIBinder();
 	}
 }

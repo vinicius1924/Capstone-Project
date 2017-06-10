@@ -53,14 +53,12 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 	@Override
 	public void startLoader()
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainModel.startLoader()");
 		(mPresenter.getActivity()).getSupportLoaderManager().initLoader(SUBREDDITSLOADER, null, this);
 	}
 
 	@Override
 	public void getDefaultSubreddits()
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainModel.getDefaultSubreddits()");
 		/*
 		 * Testa se o banco de dados tem dados na tabela que guarda os subreddits.
 		 * Se não tiver dados então faz uma chamada para pegar os subreddits default e salva no banco de dados.
@@ -110,8 +108,6 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 											}
 											else
 											{
-												//TODO: avisar que houve um erro baixando os subreddits para que a MainActivity
-												//TODO: saiba que nao precisa mais mostrar o loader na tela
 												mPresenter.onErrorGetDefaultSubreddits(mPresenter.getActivityContext().getResources().
 														  getString(R.string.refresh_token_error));
 												Log.e(MainActivity.MAINACTIVITYTAG, "MainModel.getDefaultSubreddits() - " +
@@ -179,7 +175,6 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args)
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainModel.onCreateLoader()");
 		return new android.support.v4.content.CursorLoader(mPresenter.getActivityContext(),
 				  SubredditContract.SubredditsEntry.CONTENT_URI,
 				  null,
@@ -191,14 +186,12 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data)
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainModel.onLoadFinished()");
 		mPresenter.onLoadDataFinished(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainModel.onLoaderReset()");
 		mPresenter.onLoaderReset(loader);
 	}
 

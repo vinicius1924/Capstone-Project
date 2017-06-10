@@ -64,7 +64,6 @@ public class LoginActivity extends AccountAuthenticatorActivity
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		Log.d("Authenticator", "LoginActivity.onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
 
@@ -111,8 +110,6 @@ public class LoginActivity extends AccountAuthenticatorActivity
 		}
 		else
 		{
-			Log.d("LoginActivity", "startLogin");
-
 			String url = String.format(AUTH_URL, CLIENT_ID, STATE, REDIRECT_URI);
 
 			webView.getSettings().setJavaScriptEnabled(true);
@@ -170,8 +167,6 @@ public class LoginActivity extends AccountAuthenticatorActivity
 
 	private void handleRedirectUri(Uri uri)
 	{
-		Log.d("Authenticator", "LoginActivity.handleRedirectUri()");
-
 		if(uri.getQueryParameter("error") != null)
 		{
 			String error = uri.getQueryParameter("error");
@@ -202,7 +197,6 @@ public class LoginActivity extends AccountAuthenticatorActivity
 	{
 		webView.setVisibility(View.INVISIBLE);
 		progressBar.setVisibility(View.VISIBLE);
-		Log.d("Authenticator", "LoginActivity.getAccessToken()");
 
 		IApiServices apiServices = new Retrofit.Builder()
 				  .baseUrl(ApiClient.BASE_URL)

@@ -77,8 +77,6 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 	public void onPerformSync(final Account account, Bundle extras, String authority, ContentProviderClient provider,
 									  SyncResult syncResult)
 	{
-		Log.d(TAG, "SubRedditSyncAdapter.onPerformSync()");
-
 		if(accountManager.getAccountsByType(mContext.getString(R.string.sync_account_type)).length > 0)
 		{
 			try
@@ -91,7 +89,7 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 				}
 				else
 				{
-					Log.d(TAG, "token é null");
+
 				}
 			}
 			catch(OperationCanceledException e)
@@ -114,8 +112,6 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 
 	private String getAccountToken() throws AuthenticatorException, OperationCanceledException, IOException
 	{
-		Log.d(TAG, "SubRedditSyncAdapter.getAccountToken()");
-
 		IToken tokenImpl = new TokenImpl();
 
 		String token = tokenImpl.getAccountTokenAsynchronously(mContext);
@@ -125,8 +121,6 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 
 	private void getSubredditsPosts()
 	{
-		Log.d(TAG, "SubRedditSyncAdapter.getSubredditsPosts()");
-
 		//pega os subreddits que o usuário está subscribed
 		final Cursor cursor = mContext.getContentResolver().query(SubredditContract.SubredditsEntry.CONTENT_URI,
 				  null,
@@ -236,7 +230,6 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 							}
 							else
 							{
-								Log.d(TAG, "SubRedditSyncAdapter.getSubredditsPosts() response");
 								List<GetSubredditsPostsResponse.Children> safeForWork = new ArrayList<GetSubredditsPostsResponse
 										  .Children>();
 
@@ -313,7 +306,6 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 
 	public static void onAccountCreated(Account newAccount, Context context)
 	{
-		Log.d("Authenticator", "SubRedditSyncAdapter.onAccountCreated()");
         /*
          * Since we've created an account
          */
@@ -330,8 +322,6 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 	 */
 	public static void configurePeriodicSync(Context context, int syncInterval, int flexTime)
 	{
-		Log.d("Authenticator", "SubRedditSyncAdapter.configurePeriodicSync()");
-
 		Account account = AccountManager.get(context).getAccountsByType(context.getString(R.string.sync_account_type))[0];//getSyncAccount(context);
 
 		String authority = context.getString(R.string.content_authority);
@@ -357,7 +347,6 @@ public class SubRedditSyncAdapter extends AbstractThreadedSyncAdapter
 	 */
 	public static void syncImmediately(Context context)
 	{
-		Log.d("Authenticator", "SubRedditSyncAdapter.syncImmediately()");
 		Bundle bundle = new Bundle();
 		bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 		bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);

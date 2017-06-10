@@ -34,7 +34,6 @@ public class WidgetProvider extends AppWidgetProvider
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
 	{
-		Log.d(TAG, "WidgetProvider.onUpdate()");
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
 
 		for (int appWidgetId : appWidgetIds)
@@ -77,7 +76,6 @@ public class WidgetProvider extends AppWidgetProvider
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-		Log.d(TAG, "WidgetProvider.onReceive()");
 		super.onReceive(context, intent);
 
 		if(ACTION_DATA_UPDATED.equals(intent.getAction()))

@@ -83,7 +83,6 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onCreate()
 	{
-		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onCreate()");
 		mModel.startLoader();
 		mModel.fetchSubredditPosts();
 	}
@@ -91,26 +90,24 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onStart()
 	{
-		Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onStart()");
 		mModel.onStart();
 	}
 
 	@Override
 	public void onResume()
 	{
-		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onResume()");
+
 	}
 
 	@Override
 	public void onPause()
 	{
-		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onPause()");
+
 	}
 
 	@Override
 	public void onStop()
 	{
-		Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onStop()");
 		mModel.onStop();
 	}
 
@@ -123,7 +120,6 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onSwipeRefresh()
 	{
-		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onSwipeRefresh()");
 		mModel.loadMore25Posts();
 	}
 
@@ -176,14 +172,12 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onLoadDataFinished(Cursor data)
 	{
-		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onLoadDataFinished()");
 		getView().onLoadDataFinished(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
-		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onLoaderReset()");
 		getView().onLoaderReset(loader);
 	}
 
@@ -197,7 +191,6 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 	@Override
 	public void onLoadPostsFinished()
 	{
-		//Log.d(PostsActivity.POSTSACTIVITYTAG, "PostsPresenter.onLoadPostsFinished()");
 		getView().onLoadPostsFinished();
 	}
 
@@ -221,14 +214,10 @@ public class PostsPresenter implements IPostsMVP.PresenterOps, IPostsMVP.Require
 			String permalink = postCursor.getString(postCursor.getColumnIndex(SubredditContract.
 					  SubredditsPostsEntry.COLUMN_PERMALINK));
 
-			Log.d(PostsActivity.POSTSACTIVITYTAG, permalink);
-
 			Intent intent = new Intent(getView().getActivityContext(), ReadPostActivity.class);
 			intent.putExtra(ReadPostActivity.EXTRA_PERMALINK, permalink);
 
 			getView().getActivityContext().startActivity(intent);
-
-			Log.d(PostsActivity.POSTSACTIVITYTAG, permalink);
 		}
 	}
 

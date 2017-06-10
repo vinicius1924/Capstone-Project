@@ -1,12 +1,10 @@
 package com.example.vinicius.capstone.view;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.vinicius.capstone.DividerItemDecoration;
 import com.example.vinicius.capstone.R;
@@ -50,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Log.d(MAINACTIVITYTAG, "MainActivity.onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
@@ -84,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	protected void onStart()
 	{
-		Log.d(MAINACTIVITYTAG, "MainActivity.onStart()");
 		super.onStart();
 
 		mPresenter.onStart();
@@ -93,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	protected void onResume()
 	{
-		Log.d(MAINACTIVITYTAG, "MainActivity.onResume()");
 		super.onResume();
 
 		mPresenter.onResume();
@@ -102,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	protected void onPause()
 	{
-		Log.d(MAINACTIVITYTAG, "MainActivity.onPause()");
 		super.onPause();
 
 		mPresenter.onPause();
@@ -111,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	protected void onStop()
 	{
-		Log.d(MAINACTIVITYTAG, "MainActivity.onStop()");
 		super.onStop();
 
 		mPresenter.onStop();
@@ -146,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 		{
 			if(mStateMaintainer.firstTimeIn())
 			{
-				Log.d(MAINACTIVITYTAG, "Criado fragmento para manter o estado da instância do presenter " + "e do model");
 				initialize(this);
 			}
 			else
@@ -191,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 
 		if(mPresenter == null)
 		{
-			Log.w(MAINACTIVITYTAG, "recriando o Presenter");
 			initialize(view);
 		}
 		else
@@ -245,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	public void onLoadDataFinished(Cursor data)
 	{
-		Log.d(MAINACTIVITYTAG, "MainActivity.onLoadDataFinished()");
 		/* significa que os subreddits default não foram baixados da api e armazenados no banco de dados local */
 		if(data == null || !data.moveToFirst())
 		{
@@ -262,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements IMainMVP.Required
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
-		Log.d(MAINACTIVITYTAG, "MainActivity.onLoaderReset()");
 		subredditsRecyclerAdapter.swapCursor(null);
 	}
 }

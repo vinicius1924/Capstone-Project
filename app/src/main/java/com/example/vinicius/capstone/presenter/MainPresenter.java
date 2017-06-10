@@ -87,21 +87,18 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 	@Override
 	public void onLoadDataFinished(Cursor data)
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.onLoadDataFinished()");
 		getView().onLoadDataFinished(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.onLoaderReset()");
 		getView().onLoaderReset(loader);
 	}
 
 	@Override
 	public void noInternetConnection()
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.noInternetConnection()");
 		getView().showSnackBar(getView().getActivityContext().getResources()
 				  .getString(R.string.no_internet_connection));
 		getView().setProgressBarVisibility(View.INVISIBLE);
@@ -110,15 +107,12 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 	@Override
 	public void onCreate()
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.onCreate()");
-		Log.d("Authenticator", "MainPresenter.onCreate()");
 		addAccount();
 		mModel.startLoader();
 	}
 
 	private void addAccount()
 	{
-		Log.d("Authenticator", "MainPresenter.addAccount()");
 		/* Chama o método addAccount da classe SubRedditAuthenticator */
 		mAccountManager.addAccount(getView().getActivityContext().getString(R.string.sync_account_type), ACCOUNT_TOKEN_TYPE_FULL_ACCESS, null, null, (AppCompatActivity) getView(), new AccountManagerCallback<Bundle>()
 		{
@@ -132,14 +126,10 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 
 					if(error == 400)
 					{
-						Log.d(MainActivity.MAINACTIVITYTAG, "Já existe uma conta criada");
-
 						if(!PreferencesUtils.isSyncAdapterInitialized(getView().getActivityContext(),
 								  getView().getActivityContext().
 											 getString(R.string.sync_adapter_initialized_preferences_key)))
 						{
-							Log.d(MainActivity.MAINACTIVITYTAG, "SyncAdapter not initialized");
-
 							PreferencesUtils.writeSyncAdapterInitialized(getView().getActivityContext(),
 									  getView().getActivityContext().
 												 getString(R.string.sync_adapter_initialized_preferences_key), true);
@@ -159,7 +149,6 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 
 		if(mAccountManager.getAccountsByType(getView().getActivityContext().getString(R.string.sync_account_type)).length == 0)
 		{
-			Log.d(MainActivity.MAINACTIVITYTAG, "Finish MainActivity");
 			getView().finishActivity();
 		}
 	}
@@ -167,14 +156,12 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 	@Override
 	public void onStart()
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.onStart()");
 		getDefaultSubreddits();
 	}
 
 	@Override
 	public void getDefaultSubreddits()
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "MainPresenter.getDefaultSubreddits()");
 		mModel.getDefaultSubreddits();
 	}
 
@@ -269,7 +256,6 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 				String subredditUrl = subredditCursor.getString(subredditCursor.getColumnIndex(SubredditContract.SubredditsEntry.COLUMN_URL));
 				String subredditName = subredditCursor.getString(subredditCursor.getColumnIndex(SubredditContract.SubredditsEntry.COLUMN_NAME));
 
-				Log.d(MainActivity.MAINACTIVITYTAG, "SUBSCRIBED");
 				Intent intent = new Intent(getView().getActivityContext(), PostsActivity.class);
 				intent.putExtra(PostsActivity.EXTRA_SUBREDDIT_ID, subredditId);
 				intent.putExtra(PostsActivity.EXTRA_SUBREDDIT_URL, subredditUrl);
@@ -278,7 +264,7 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 			}
 			else
 			{
-				Log.d(MainActivity.MAINACTIVITYTAG, "UNSUBSCRIBED");
+
 			}
 		}
 	}

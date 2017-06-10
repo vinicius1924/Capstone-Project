@@ -54,7 +54,6 @@ public class CapstoneRemoteViewsService  extends RemoteViewsService
 	@Override
 	public RemoteViewsFactory onGetViewFactory(Intent intent)
 	{
-		Log.d(TAG, "CapstoneRemoteViewsService.onGetViewFactory()");
 		context = this.getApplicationContext();
 
 		/* É uma interface para um Adapter entre uma collection view
@@ -67,13 +66,12 @@ public class CapstoneRemoteViewsService  extends RemoteViewsService
 			@Override
 			public void onCreate()
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.onCreate()");
+
 			}
 
 			@Override
 			public void onDataSetChanged()
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.onDataSetChanged()");
 				if (data != null)
 				{
 					data.close();
@@ -97,7 +95,6 @@ public class CapstoneRemoteViewsService  extends RemoteViewsService
 			@Override
 			public void onDestroy()
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.onDestroy()");
 				if(data != null)
 				{
 					data.close();
@@ -108,14 +105,12 @@ public class CapstoneRemoteViewsService  extends RemoteViewsService
 			@Override
 			public int getCount()
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.getCount()");
 				return data == null ? 0 : data.getCount();
 			}
 
 			@Override
 			public RemoteViews getViewAt(int position)
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.getViewAt()");
 				if (position == AdapterView.INVALID_POSITION || data == null || !data.moveToPosition(position))
 				{
 					return null;
@@ -165,21 +160,18 @@ public class CapstoneRemoteViewsService  extends RemoteViewsService
 			@Override
 			public RemoteViews getLoadingView()
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.getLoadingView()");
 				return null;
 			}
 
 			@Override
 			public int getViewTypeCount()
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.getViewTypeCount()");
 				return 1;
 			}
 
 			@Override
 			public long getItemId(int position)
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.getItemId()");
 				if(data.moveToPosition(position))
 					return data.getLong(0);
 				return position;
@@ -188,7 +180,6 @@ public class CapstoneRemoteViewsService  extends RemoteViewsService
 			@Override
 			public boolean hasStableIds()
 			{
-				Log.d(TAG, "CapstoneRemoteViewsService.RemoteViewsFactory.hasStableIds()");
 				return true;
 			}
 		};

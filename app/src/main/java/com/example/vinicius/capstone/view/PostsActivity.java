@@ -16,7 +16,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,10 +24,8 @@ import com.example.vinicius.capstone.DividerItemDecoration;
 import com.example.vinicius.capstone.PostsRecyclerAdapter;
 import com.example.vinicius.capstone.R;
 import com.example.vinicius.capstone.StateMaintainer;
-import com.example.vinicius.capstone.data.SubredditContract;
 import com.example.vinicius.capstone.interfaces.IPostsMVP;
 import com.example.vinicius.capstone.presenter.PostsPresenter;
-import com.example.vinicius.capstone.sync.SubRedditSyncAdapter;
 
 public class PostsActivity extends AppCompatActivity implements IPostsMVP.RequiredViewOps,
 		  SwipeRefreshLayout.OnRefreshListener
@@ -56,7 +53,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_posts);
 
@@ -115,7 +111,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	@Override
 	protected void onStart()
 	{
-		Log.d(POSTSACTIVITYTAG, "PostsActivity.onStart()");
 		super.onStart();
 
 		mPresenter.onStart();
@@ -124,7 +119,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	@Override
 	protected void onResume()
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onResume()");
 		super.onResume();
 
 		mPresenter.onResume();
@@ -133,7 +127,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	@Override
 	protected void onPause()
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onPause()");
 		super.onPause();
 
 		mPresenter.onPause();
@@ -142,7 +135,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	@Override
 	protected void onStop()
 	{
-		Log.d(POSTSACTIVITYTAG, "PostsActivity.onStop()");
 		super.onStop();
 
 		mPresenter.onStop();
@@ -172,8 +164,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 		{
 			if(mStateMaintainer.firstTimeIn())
 			{
-//				Log.d(POSTSACTIVITYTAG, "Criado fragmento para manter o estado da instância do presenter " +
-//						  "e do model");
 				initialize(this);
 			}
 			else
@@ -218,7 +208,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 
 		if(mPresenter == null)
 		{
-			Log.w(POSTSACTIVITYTAG, "recriando o Presenter");
 			initialize(view);
 		}
 		else
@@ -294,7 +283,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	@Override
 	public void onLoadDataFinished(Cursor data)
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onLoadDataFinished()");
 		if(data == null || !data.moveToFirst())
 		{
 			noDataAvailableVisibility(View.VISIBLE);
@@ -310,7 +298,6 @@ public class PostsActivity extends AppCompatActivity implements IPostsMVP.Requir
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsActivity.onLoaderReset()");
 		postsRecyclerAdapter.swapCursor(null);
 	}
 }

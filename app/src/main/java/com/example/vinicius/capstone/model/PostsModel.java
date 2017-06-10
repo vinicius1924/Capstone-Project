@@ -67,14 +67,12 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	@Override
 	public void startLoader()
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsModel.startLoader()");
 		(mPresenter.getActivity()).getSupportLoaderManager().initLoader(POSTSLOADER, null, this);
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args)
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsModel.onCreateLoader()");
 		Uri postsUri = SubredditContract.SubredditsPostsEntry.buildSubredditsPostsUri(subredditId);
 
 		android.support.v4.content.CursorLoader cursorLoader = new android.support.v4.content.CursorLoader(
@@ -91,14 +89,12 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data)
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsModel.onLoadFinished()");
 		mPresenter.onLoadDataFinished(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader)
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsModel.onLoaderReset()");
 		mPresenter.onLoaderReset(loader);
 	}
 
@@ -107,8 +103,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	{
 		if(callGetMore25SubredditsPosts != null && callGetMore25SubredditsPosts.isCanceled())
 		{
-			Log.d(POSTSACTIVITYTAG, "PostsModel.onStart() - callGetMore25SubredditsPosts.isCanceled() == true");
-
 			mPresenter.loadMore25PostsRequestStopped();
 			callGetMore25SubredditsPosts = null;
 		}
@@ -119,7 +113,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	{
 		if(callGetMore25SubredditsPosts != null)
 		{
-			Log.d(POSTSACTIVITYTAG, "PostsModel.onStop().callGetMore25SubredditsPosts.cancel()");
 			callGetMore25SubredditsPosts.cancel();
 		}
 	}
@@ -127,7 +120,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	@Override
 	public void loadMore25Posts()
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts()");
 		final IToken tokenImpl = new TokenImpl();
 
 		Uri uri = SubredditContract.SubredditsEntry.buildSubredditsUri(subredditId);
@@ -172,10 +164,8 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 						public void onResponse(Call<GetSubredditsPostsResponse> call, Response<GetSubredditsPostsResponse>
 								  response)
 						{
-							Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onResponse()");
 							if(response.code() == 401)
 							{
-								Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onResponse().refreshToken");
 								AccountManager accountManager = (AccountManager) mPresenter.getActivityContext().
 										  getSystemService(Context.ACCOUNT_SERVICE);
 
@@ -191,7 +181,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 							}
 							else
 							{
-								Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onResponse().checkResponse");
 								List<GetSubredditsPostsResponse.Children> safeForWork = new ArrayList<GetSubredditsPostsResponse
 										  .Children>();
 
@@ -254,7 +243,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 								}
 								else
 								{
-									Log.d(POSTSACTIVITYTAG, "PostsModel.loadMore25Posts().onResponse().noPosts");
 									mPresenter.showMessageOnToast(mPresenter.getActivityContext().getResources().
 											  getString(R.string.no_more_posts));
 								}
@@ -290,7 +278,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 	@Override
 	public void fetchSubredditPosts()
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsModel.fetchSubredditPosts()");
 		Uri uri = SubredditContract.SubredditsEntry.buildSubredditsUri(subredditId);
 
 		final Cursor cursor = mPresenter.getActivityContext().getContentResolver().query(uri,
@@ -316,7 +303,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 
 	private void downloadSubredditPosts(final String subredditUrl, final int subredditId)
 	{
-		//Log.d(POSTSACTIVITYTAG, "PostsModel.downloadSubredditPosts()");
 		mPresenter.progressBarVisibility(View.VISIBLE);
 		mPresenter.swipeRefreshEnabled(false);
 		// baixa os ultimos 25 posts do subreddit e armazena no banco e dados
@@ -363,9 +349,6 @@ public class PostsModel implements IPostsMVP.ModelOps, LoaderManager.LoaderCallb
 											mPresenter.swipeRefreshEnabled(true);
 											mPresenter.showMessageOnToast(mPresenter.getActivityContext().getResources().
 													  getString(R.string.refresh_token_error));
-											//TODO: avisar que aconteceu um erro baixando os primeiros 25 posts
-											//TODO: desse subreddit para que PostsActivity possa saber quando não
-											//TODO: mostrar mais o loader na tela
 										}
 									}
 								});

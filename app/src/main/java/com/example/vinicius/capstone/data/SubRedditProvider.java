@@ -57,7 +57,6 @@ public class SubRedditProvider extends ContentProvider
 	public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[]
 			  selectionArgs, @Nullable String sortOrder)
 	{
-		Log.d(MainActivity.MAINACTIVITYTAG, "SubRedditProvider.query()");
 		final SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor cursor = null;
 		long _id;
