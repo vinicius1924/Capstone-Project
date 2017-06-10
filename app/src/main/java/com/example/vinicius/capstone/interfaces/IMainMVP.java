@@ -98,6 +98,8 @@ public interface IMainMVP
 		void startLoader();
 
 		void getDefaultSubreddits();
+
+		void onStop();
 		// Qualquer operação referente à dados a ser chamado pelo Presenter
 	}
 }

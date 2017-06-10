@@ -210,7 +210,7 @@ public class MainPresenter implements IMainMVP.PresenterOps, IMainMVP.RequiredPr
 	@Override
 	public void onStop()
 	{
-
+		mModel.onStop();
 	}
 
 	@Override

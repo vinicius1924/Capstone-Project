@@ -42,6 +42,7 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 	private IMainMVP.RequiredPresenterOps mPresenter;
 	private AccountManager mAccountManager;
 	public static final int SUBREDDITSLOADER = 0;
+	private Call<GetDefaultSubredditsResponse> callGetDefaultSubreddits = null;
 
 	public MainModel(IMainMVP.RequiredPresenterOps mPresenter)
 	{
@@ -82,8 +83,8 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 					final IApiServices apiServices = new Retrofit.Builder()
 							  .baseUrl(ApiClient.BASE_URL)
 							  .addConverterFactory(GsonConverterFactory.create())
-							  .build().create(IApiServices.class);//ApiClient.getClient().create(IApiServices.class);
-					Call<GetDefaultSubredditsResponse> callGetDefaultSubreddits = apiServices.getDefaultSubreddits("bearer " + token);
+							  .build().create(IApiServices.class);
+					callGetDefaultSubreddits = apiServices.getDefaultSubreddits("bearer " + token);
 
 					if(NetworkUtils.isOnline(mPresenter.getActivityContext()))
 					{
@@ -156,8 +157,12 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 							@Override
 							public void onFailure(Call<GetDefaultSubredditsResponse> call, Throwable t)
 							{
-								mPresenter.onErrorGetDefaultSubreddits(mPresenter.getActivityContext().getResources().
-										  getString(R.string.connection_error));
+								if(!call.isCanceled())
+								{
+									mPresenter.onErrorGetDefaultSubreddits(mPresenter.getActivityContext().getResources().
+											  getString(R.string.connection_error));
+								}
+
 								Log.e(MainActivity.MAINACTIVITYTAG, "MainModel.getDefaultSubreddits() - " + t.toString());
 							}
 						});
@@ -230,5 +235,14 @@ public class MainModel implements IMainMVP.ModelOps, LoaderManager.LoaderCallbac
 	{
 		mPresenter.getActivityContext().getContentResolver().delete(SubredditContract.SubredditsPostsEntry.CONTENT_URI,
 				  SubredditContract.SubredditsPostsEntry.COLUMN_SUBREDDITS_ID + " = ?", new String[]{String.valueOf(subredditId)});
+	}
+
+	@Override
+	public void onStop()
+	{
+		if(callGetDefaultSubreddits != null)
+		{
+			callGetDefaultSubreddits.cancel();
+		}
 	}
 }

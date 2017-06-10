@@ -3,7 +3,8 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="@dimen/single_list_item_height"
-              android:paddingEnd="@dimen/list_item_right_padding">
+              android:paddingEnd="@dimen/list_item_right_padding"
+                android:focusable="true">
     
     <TextView
         android:id="@+id/subredditName"
@@ -22,7 +23,7 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:textAppearance="@style/ButtonSubscribedTextStyle"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         tools:text="Subscribed"/>
 
 </RelativeLayout>
