@@ -33,6 +33,7 @@ public class SubredditsRecyclerAdapter extends CursorRecyclerAdapter<SubredditsR
 		this.mSubscribeUnsubscribeListener = mSubscribeUnsubscribeListener;
 	}
 
+
 	@Override
 	public void bindViewHolder(CustomViewHolder holder, Context context, Cursor cursor)
 	{
@@ -71,7 +72,7 @@ public class SubredditsRecyclerAdapter extends CursorRecyclerAdapter<SubredditsR
 		void onUnSubscribeReddit(int subredditId, String subredditUrl);
 	}
 
-	class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
+	public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
 	{
 		protected TextView subredditName;
 		protected Button subscribeUnsubscribeButton;
@@ -117,6 +118,16 @@ public class SubredditsRecyclerAdapter extends CursorRecyclerAdapter<SubredditsR
 			{
 				mOnClickListener.onListItemClick(cursor.getInt(idColumnIndex));
 			}
+		}
+
+		public TextView getSubredditName()
+		{
+			return subredditName;
+		}
+
+		public Button getSubscribeUnsubscribeButton()
+		{
+			return subscribeUnsubscribeButton;
 		}
 	}
 }
