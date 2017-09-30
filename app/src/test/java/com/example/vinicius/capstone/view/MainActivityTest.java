@@ -28,4 +28,10 @@ public class MainActivityTest
 		activity = Robolectric.buildActivity(MainActivity.class).create().get();
 	}
 
+	@Test
+	public void addition_isCorrect() throws Exception
+	{
+		assertEquals(4, 2 + 2);
+	}
+
 }
