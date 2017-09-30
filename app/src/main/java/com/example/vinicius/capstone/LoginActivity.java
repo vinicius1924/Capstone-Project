@@ -112,6 +112,8 @@ public class LoginActivity extends AccountAuthenticatorActivity
 		{
 			String url = String.format(AUTH_URL, CLIENT_ID, STATE, REDIRECT_URI);
 
+			Log.d("LoginActivity", "login url - " + url);
+
 			webView.getSettings().setJavaScriptEnabled(true);
 			webView.clearCache(true);
 			webView.loadUrl(url);
